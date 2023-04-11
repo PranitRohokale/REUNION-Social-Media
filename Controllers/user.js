@@ -97,3 +97,39 @@ exports.signin = async (req, res) => {
     }
 
 }
+
+exports.getUserInfo = async (req, res) => {
+
+    const { userId } = req.body
+
+    try {
+        // get user from DB
+        const isUserExists = await User.findByPk(userId)
+
+        // if user not found in DB
+        if (!isUserExists) {
+            return res.status(400).json({
+                status: false,
+                data: isUserExists,
+                message: `user not exits `
+            })
+        }
+
+        return res.status(200).json({
+            status: true,
+            data: {
+                ...isUserExists,
+                password: undefined
+            }
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            status: false,
+            error,
+            message: "Something went wrong!!"
+        })
+    }
+
+}

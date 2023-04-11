@@ -21,6 +21,14 @@ const User = sequelize.define('user', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    followerCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
+    followingCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
     createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
@@ -28,16 +36,16 @@ const User = sequelize.define('user', {
     updatedAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-    }
+    },
 }, {
     indexes: [
         {
             unique: true,
-            fields: ['id']
+            fields: ['email']
         }
     ]
-}
-);
+});
+
 
 
 User.beforeCreate((user) => {
