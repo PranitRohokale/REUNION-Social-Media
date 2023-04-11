@@ -28,8 +28,16 @@ const User = sequelize.define('user', {
     updatedAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-    },
-});
+    }
+}, {
+    indexes: [
+        {
+            unique: true,
+            fields: ['id']
+        }
+    ]
+}
+);
 
 
 User.beforeCreate((user) => {

@@ -32,6 +32,13 @@ const Like = sequelize.define('like', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
+}, {
+    indexes: [
+        {
+            unique: true,
+            fields: ['id']
+        }
+    ]
 });
 
 

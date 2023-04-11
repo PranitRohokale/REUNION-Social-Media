@@ -3,6 +3,7 @@ const express = require("express");
 require("dotenv").config();
 
 const sequelize = require("./config/db");
+const userRoute = require("./Routers/user")
 
 
 const PORT = process.env.PORT || 4000;
@@ -11,7 +12,7 @@ const app = express()
 //normal middleware
 app.use(express.json());
 
-
+app.use("/api", userRoute)
 
 app.get("/", async (req, res) => {
     res.status(200).send("Welcome Dude!");

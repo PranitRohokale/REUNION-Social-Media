@@ -40,7 +40,30 @@ const Post = sequelize.define('post', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
+}, {
+    indexes: [
+        {
+            unique: true,
+            fields: ['id']
+        }
+    ]
 });
+
+Post.prototype.incrementLikes = async function () {
+    await this.increment('likesCount');
+};
+
+Post.prototype.decrementLikes = async function () {
+    await this.decrement('likesCount');
+};
+
+Post.prototype.incrementComments = async function () {
+    await this.increment('commentsCount');
+};
+
+Post.prototype.decrementComments = async function () {
+    await this.decrement('commentsCount');
+};
 
 
 module.exports = Post
