@@ -1,9 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
-const Post = require("./post");
 const User = require("./user");
-
-
+const Post = require("./post");
 
 const Comment = sequelize.define('comment', {
     id: {
@@ -11,8 +9,8 @@ const Comment = sequelize.define('comment', {
         primaryKey: true,
         autoIncrement: true,
     },
-    comment: {
-        type: DataTypes.STRING,
+    content: {
+        type: DataTypes.TEXT,
         allowNull: false,
     },
     userId: {
@@ -37,7 +35,13 @@ const Comment = sequelize.define('comment', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
+}, {
+    indexes: [
+        {
+            unique: true,
+            fields: ['id']
+        }
+    ]
 });
 
-
-module.exports = Comment
+module.exports = Comment;
