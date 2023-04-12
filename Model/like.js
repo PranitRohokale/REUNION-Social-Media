@@ -20,6 +20,7 @@ const Like = sequelize.define('like', {
             key: 'id'
         },
         primaryKey: true,
+        onDelete: "CASCADE"
     },
     isLike: {
         type: DataTypes.BOOLEAN,
