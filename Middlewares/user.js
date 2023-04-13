@@ -1,4 +1,4 @@
-const isLoggedIn = (req, res, next) => {
+exports.isLoggedIn = (req, res, next) => {
     // console.log(req.cookies);
     const token =
         req.cookies.token ||
@@ -21,6 +21,3 @@ const isLoggedIn = (req, res, next) => {
     }
 };
 
-export default {
-    isLoggedIn
-}

@@ -25,7 +25,8 @@ const Comment = sequelize.define('comment', {
         references: {
             model: Post,
             key: 'id'
-        }
+        },
+        onDelete: "CASCADE",
     },
     createdAt: {
         type: DataTypes.DATE,

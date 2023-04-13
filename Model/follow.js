@@ -38,5 +38,9 @@ const Follow = sequelize.define('Follow',
     ]
 });
 
+// followerId: the ID of the user who is following another user
+// followingId: the ID of the user who is being followed
+
+// followerId --> followingId
 
 module.exports = Follow
