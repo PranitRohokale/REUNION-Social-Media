@@ -1,0 +1,190 @@
+openapi : 3.0.0
+info:
+  title: Social Media - Reunion
+  description:  api developed by Pranit Rohokale .
+  version: 1.0.0
+  contact:
+    email : pranitrohokale@gmail.com
+    url : https://github.com/PranitRohokale
+
+servers:
+  - url: "http://localhost:4000/api/"
+    description: for localhost - regular (Development)
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cookieAuth:         # arbitrary name for the security scheme; will be used in the "security" key later
+      type: apiKey
+      in: cookie
+      name: token
+
+security:
+  - bearerAuth: []
+
+paths:
+  #create user
+  /signup:
+    post:
+      tags:
+        - User
+      summary: create new user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                mobile:
+                  type: string
+                role:
+                  type: integer
+                password:
+                  type: string
+                
+      responses:
+        200:
+          description: newly created user info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user_id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  createdAt:
+                    type: string
+                  mobile:
+                    type: string  
+        400:
+          description: Bad request
+        500:
+          description: internal server error
+  
+  /signin:
+    post:
+      tags:
+        - User
+      summary: signin user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                
+      responses:
+        200:
+          description: user info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user_id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  token:
+                    type: string
+                  mobile:
+                    type: string  
+        400:
+          description: Bad request
+        500:
+          description: internal server error
+
+ 
+  paths:
+  /follow/{id}:
+    post:
+      summary: Follow a user
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user to follow
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: ID of the new follow relationship
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  followId:
+                    type: integer
+                    description: ID of the new follow relationship
+                    example: 456
+        '400':
+          description: User is already being followed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: User is already being followed
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: User not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: Something went wrong!!
+
+  
+  

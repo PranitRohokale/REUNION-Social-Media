@@ -2,6 +2,10 @@ const express = require("express");
 
 require("dotenv").config();
 
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+const swaggerDocument = YAML.load("./swagger.yaml");
+
 const sequelize = require("./config/db");
 
 const userRoute = require("./Routers/user")
@@ -15,8 +19,9 @@ const app = express()
 
 //normal middleware
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use("/api", [userRoute, postRoute])
+app.use("/api", [userRoute, postRoute, commentRoute, likesRoute])
 
 app.get("/", async (req, res) => {
     res.status(200).send("Welcome Dude!");
