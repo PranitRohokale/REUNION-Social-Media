@@ -1,13 +1,13 @@
 exports.isLoggedIn = (req, res, next) => {
     // console.log(req.cookies);
     const token =
-        req.cookies.token ||
-        req.body.token ||
-        req.header("Authorization").replace("Bearer ", "");
+        req.cookies?.token ||
+        req.body?.token ||
+        req?.header("Authorization")?.replace("Bearer ", "");
 
-    if (!token) {
-        return res.status(403).send("token is missing");
-    }
+            if (!token) {
+            return res.status(403).send("login first");
+        }
 
     try {
         const { userId } = jwt.verify(token, process.env.JWT_SECRET);
