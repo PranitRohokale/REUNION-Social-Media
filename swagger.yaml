@@ -31,64 +31,111 @@ paths:
   /signup:
     post:
       tags:
-        - User
-      summary: create new user
-      consumes:
-        - application/json
-      produces:
-        - application/json
+          - Authentication
+      summary: Signup a new user
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - name
+                - email
+                - password
               properties:
                 name:
                   type: string
                 email:
                   type: string
-                mobile:
-                  type: string
-                role:
-                  type: integer
                 password:
                   type: string
-                
       responses:
-        200:
-          description: newly created user info
+        '200':
+          description: User created successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
+                  status:
                     type: boolean
-                  user_id:
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      email:
+                        type: string
+                        example: john@example.com
+                  message:
                     type: string
-                  name:
+                    example: user created successfully!!
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Validation error: Email is required"
+                  message:
                     type: string
-                  email:
+                    example: email and Password all fields Required!
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        example: john@example.com
+                  message:
                     type: string
-                  createdAt:
+                    example: user already exists with john@example.com
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Something went wrong!!
+                  message:
                     type: string
-                  mobile:
-                    type: string  
-        400:
-          description: Bad request
-        500:
-          description: internal server error
+                    example: Something went wrong!!
   
-  /signin:
+  /authenticate:
     post:
+      summary: Authenticates a user and returns an access token
       tags:
-        - User
-      summary: signin user
-      consumes:
-        - application/json
-      produces:
-        - application/json
+        - Authentication
       requestBody:
         required: true
         content:
@@ -98,36 +145,132 @@ paths:
               properties:
                 email:
                   type: string
+                  format: email
                 password:
                   type: string
-                
+                  minLength: 8
+                  maxLength: 50
+              required:
+                - email
+                - password
       responses:
-        200:
-          description: user info
+        '200':
+          description: Successfully authenticated the user and returned an access token
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
+                  status:
                     type: boolean
-                  user_id:
+                    description: Indicates whether the authentication was successful
+                    example: true
+                  data:
+                    type: object
+                    description: The user object with the access token
+                    properties:
+                      id:
+                        type: integer
+                        description: The unique identifier of the user
+                        example: 1
+                      name:
+                        type: string
+                        description: The name of the user
+                        example: John Doe
+                      email:
+                        type: string
+                        description: The email of the user
+                        example: john.doe@example.com
+                      token:
+                        type: string
+                        description: The access token for the user
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTYxNzkwNDMzMSwiZXhwIjoxNjE3OTA3OTMxfQ.NLSmHr7Q48wJU5RjQ0gZ62Lkb0UzL6jKpJl8xclQFEo
+                  message:
                     type: string
-                  name:
+                    description: A message indicating the outcome of the authentication process
+                    example: User authenticated successfully!
+        '400':
+          description: Invalid request or incorrect credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    description: Indicates whether the authentication was successful
+                    example: false
+                  message:
                     type: string
-                  email:
-                    type: string
-                  token:
-                    type: string
-                  mobile:
-                    type: string  
-        400:
-          description: Bad request
-        500:
-          description: internal server error
+                    description: A message indicating the reason for the authentication failure
+                    example: Incorrect email or password
 
- 
-  paths:
+  /user:
+    get:
+      tags:
+          - User
+      summary: Get user information
+      description: Retrieve information of the authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    description: Indicates the status of the response
+                    example: true
+                  data:
+                    type: object
+                    description: User information retrieved
+                    properties:
+                      id:
+                        type: integer
+                        description: User's ID
+                        example: 1
+                      email:
+                        type: string
+                        description: User's email address
+                        example: john.doe@example.com
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: Timestamp when the user was created
+                        example: '2022-04-11T12:00:00.000Z'
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        description: Timestamp when the user was last updated
+                        example: '2022-04-11T12:00:00.000Z'
+                      password:
+                        type: string
+                        description: User's password (always undefined for security reasons)
+                        example: undefined
+        400:
+          description: Error retrieving user information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    description: Indicates the status of the response
+                    example: false
+                  error:
+                    type: object
+                    description: Error details
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Something went wrong!!"
+      x-swagger-router-controller: UserController
+
   /follow/{id}:
     post:
       summary: Follow a user
@@ -186,5 +329,352 @@ paths:
                     description: Error message
                     example: Something went wrong!!
 
-  
-  
+  /unfollow/{id}:
+    post:
+      tags:
+          - User
+      summary: Unfollow a user
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the user to unfollow
+      responses:
+        "200":
+          description: User unfollowed successfully
+        "400":
+          description: User is not being followed
+        "404":
+          description: User not found
+        "500":
+          description: Something went wrong
+      security:
+        - BearerAuth: []
+
+  /posts:
+    post:
+      tags:
+        - Posts
+      summary: "Create a new post"
+      description: "Creates a new post and returns the created post details"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Bearer token"
+          required: true
+          type: "string"
+        - name: "post"
+          in: "body"
+          description: "Post object"
+          required: true
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: "The title of the post"
+              description:
+                type: string
+                description: "The description of the post"
+              userId:
+                type: integer
+                description: "The ID of the user who created the post"
+      responses:
+        200:
+          description: "Post created successfully"
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+                description: "The status of the request"
+              data:
+                type: object
+                description: "The created post details"
+              message:
+                type: string
+                description: "A message indicating the status of the request"
+        400:
+          description: "Bad request"
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+                description: "The status of the request"
+              message:
+                type: string
+                description: "A message indicating the status of the request"
+        401:
+          description: "Unauthorized"
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+                description: "The status of the request"
+              message:
+                type: string
+                description: "A message indicating the status of the request"
+        500:
+          description: "Internal server error"
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: "A message indicating the status of the request"
+ 
+  /potsts/{id}:
+    delete:
+      tags:
+        - Posts
+      summary: Delete a post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID of the post to be deleted
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Post deleted successfully
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Post not found
+        '500':
+          description: Internal server error
+
+  /posts/{postId}:
+    get:
+      tags:
+        - Posts
+      security:
+        - BearerAuth: []
+      summary: Get details of a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: integer
+          description: ID of the post to get details of
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  likesCount:
+                    type: integer
+                  commentsCount:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+        400:
+          description: Bad request
+        404:
+          description: Post not found
+        500:
+          description: Internal server error
+
+  /all_posts:
+    get:
+      tags:
+          - Posts
+      summary: Get all posts
+      description: Returns all the posts created by the authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: The unique identifier for the post
+                        title:
+                          type: string
+                          description: The title of the post
+                        description:
+                          type: string
+                          description: The description of the post
+                        likesCount:
+                          type: integer
+                          description: The number of likes for the post
+                        commentsCount:
+                          type: integer
+                          description: The number of comments for the post
+                        createdAt:
+                          type: string
+                          format: date-time
+                          description: The date and time when the post was created
+                        comments:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: The unique identifier for the comment
+                              comment:
+                                type: string
+                                description: The comment text
+                              createdAt:
+                                type: string
+                                format: date-time
+                                description: The date and time when the comment was created
+
+  /like/{id}:
+    post:
+      summary: Like a post
+      tags:
+        - Posts
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID of the post to like
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: User ID to like the post
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  description: ID of the user who is liking the post
+              example:
+                userId: 123
+      responses:
+        '200':
+          description: Post liked by user
+        '400':
+          description: Post already liked by user
+        '404':
+          description: Post not found
+        '500':
+          description: Internal server error
+
+  /unlike/{id}:
+    post:
+      tags:
+        - Posts
+      summary: Unlike a post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID of the post to unlike
+          schema:
+            type: integer
+        - in: body
+          name: body
+          required: true
+          description: Request body containing user ID
+          schema:
+            type: object
+            properties:
+              userId:
+                type: integer
+                description: ID of the user who is unliking the post
+      responses:
+        200:
+          description: Post unliked successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        404:
+          description: Like not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /comment/{id}:
+    post:
+      tags:
+        - Posts
+      summary: Add comment to a post
+      description: Adds a new comment to the specified post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID of the post to add comment to
+          schema:
+            type: integer
+        - in: body
+          name: Comment
+          required: true
+          description: Content and user ID of the comment to be added
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+                description: The content of the comment
+              userId:
+                type: integer
+                description: The ID of the user who made the comment
+      responses:
+        '200':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  commentId:
+                    type: integer
+                    description: The ID of the newly created comment
+        '404':
+          description: Post not found
+        '500':
+          description: Internal server error

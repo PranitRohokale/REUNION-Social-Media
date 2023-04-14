@@ -6,12 +6,12 @@ const cookieToken = require("../Utils/cookieToken");
 
 exports.signup = async (req, res) => {
 
-    const { email, password } = req.body;
+    const { email, password , name} = req.body;
 
-    if (!(email && password)) {
+    if (!(email && password && name)) {
         return res.status(400).json({
             status: false,
-            message: `email and Password all fields Required!`
+            message: `email , name and Password all fields Required!`
         })
     }
 
@@ -31,7 +31,7 @@ exports.signup = async (req, res) => {
             })
         }
 
-        const newUser = await User.create({ email, password })
+        const newUser = await User.create({ email, password , name})
         await newUser.save();
         let data = newUser.toJSON()
         data.password = undefined
@@ -79,7 +79,6 @@ exports.signin = async (req, res) => {
         if (!isPasswordCorrect) {
             return res.status(400).json({
                 status: false,
-                ok: isUserExists.password,
                 isPasswordCorrect,
                 message: `incorrect password!!`
             })
