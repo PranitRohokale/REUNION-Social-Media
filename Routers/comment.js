@@ -1,5 +1,5 @@
 const router = require("express").Router()
-import { isLoggedIn } from "../Middlewares/user"
+const { isLoggedIn } = require("../Middlewares/user")
 
 const { addComment } = require("../Controllers/comment")
 

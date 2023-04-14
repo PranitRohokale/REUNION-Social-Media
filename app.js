@@ -3,7 +3,11 @@ const express = require("express");
 require("dotenv").config();
 
 const sequelize = require("./config/db");
+
 const userRoute = require("./Routers/user")
+const postRoute = require("./Routers/post")
+const commentRoute = require("./Routers/comment")
+const likesRoute = require("./Routers/likes")
 
 
 const PORT = process.env.PORT || 4000;
@@ -12,7 +16,7 @@ const app = express()
 //normal middleware
 app.use(express.json());
 
-app.use("/api", userRoute)
+app.use("/api", [userRoute, postRoute])
 
 app.get("/", async (req, res) => {
     res.status(200).send("Welcome Dude!");
