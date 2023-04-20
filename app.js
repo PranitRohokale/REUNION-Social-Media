@@ -1,10 +1,18 @@
 const express = require("express");
+const cors = require("cors");
 
 require("dotenv").config();
 
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
+
+const corsOptions = {
+    origin: "*",
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+  };
+  
 
 const sequelize = require("./config/db");
 
@@ -20,6 +28,7 @@ const app = express()
 //normal middleware
 app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(cors(corsOptions)); // Use this after the variable declaration
 
 app.use("/api", [userRoute, postRoute, commentRoute, likesRoute])
 

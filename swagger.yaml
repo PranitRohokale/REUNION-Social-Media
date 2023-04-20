@@ -8,6 +8,8 @@ info:
     url : https://github.com/PranitRohokale
 
 servers:
+  - url: "https://social-media-n73w.onrender.com/api/"
+    description: for (Production)
   - url: "http://localhost:4000/api/"
     description: for localhost - regular (Development)
 
