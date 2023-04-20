@@ -6,7 +6,7 @@ const cookieToken = require("../Utils/cookieToken");
 
 exports.signup = async (req, res) => {
 
-    const { email, password , name} = req.body;
+    const { email, password, name } = req.body;
 
     if (!(email && password && name)) {
         return res.status(400).json({
@@ -30,8 +30,10 @@ exports.signup = async (req, res) => {
                 message: `user already exits with ${email}`
             })
         }
+        //encrypttion of password
+        const encryptPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await User.create({ email, password , name})
+        const newUser = await User.create({ email, password: encryptPassword, name })
         await newUser.save();
         let data = newUser.toJSON()
         data.password = undefined
@@ -63,10 +65,10 @@ exports.signin = async (req, res) => {
 
     try {
         // get user from DB
-        const isUserExists = await User.findOne({ where: { email: email } })
-
+        const isUserExists = await User.findOne({ where: { email } })
+        console.log(isUserExists?.password);
         // if user not found in DB
-        if (!isUserExists) {
+        if (isUserExists == null) {
             return res.status(400).json({
                 status: false,
                 data: isUserExists,
@@ -76,10 +78,12 @@ exports.signin = async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(password, isUserExists.password);
 
         //if password do not match
-        if (!isPasswordCorrect) {
+        if (isPasswordCorrect === false) {
             return res.status(400).json({
                 status: false,
                 isPasswordCorrect,
+                password,
+                isUserExists,
                 message: `incorrect password!!`
             })
         }

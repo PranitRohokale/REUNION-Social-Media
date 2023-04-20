@@ -18,7 +18,7 @@ const User = sequelize.define('user', {
         unique: true,
     },
     password: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
     },
     followerCount: {
@@ -46,18 +46,5 @@ const User = sequelize.define('user', {
     ]
 });
 
-
-
-User.beforeCreate((user) => {
-    return bcrypt.hash(user.password, 10).then(hash => {
-        user.password = hash
-    })
-})
-
-User.beforeUpdate((user) => {
-    return bcrypt.hash(user.password, 10).then(hash => {
-        user.password = hash
-    })
-})
 
 module.exports = User
