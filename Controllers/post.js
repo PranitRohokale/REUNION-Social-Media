@@ -6,10 +6,10 @@ const Comment = require("../Model/comment")
 exports.createPost = async (req, res) => {
     const { title, description, userId } = req.body
 
-    if (!(title && description))
+    if (!title || !description)
         return res.status(400).json({
             status: false,
-            message: `title and description fields Required!`
+            message: `titlee and ${description} fields Required!`
         })
 
     try {
@@ -72,7 +72,7 @@ exports.getPostDetails = async (req, res) => {
 
     try {
         // Find the post with the specified ID, along with its associated user
-        const post = await Post.findByPk(postId, { include: [User] });
+        const post = await Post.findByPk(postId);
 
         if (!post) {
             return res.status(404).json({ message: "Post not found" });

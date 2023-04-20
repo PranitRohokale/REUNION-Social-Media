@@ -359,28 +359,20 @@ paths:
         - Posts
       summary: "Create a new post"
       description: "Creates a new post and returns the created post details"
-      parameters:
-        - name: "Authorization"
-          in: "header"
-          description: "Bearer token"
-          required: true
-          type: "string"
-        - name: "post"
-          in: "body"
-          description: "Post object"
-          required: true
-          schema:
-            type: object
-            properties:
-              title:
-                type: string
-                description: "The title of the post"
-              description:
-                type: string
-                description: "The description of the post"
-              userId:
-                type: integer
-                description: "The ID of the user who created the post"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
       responses:
         200:
           description: "Post created successfully"
@@ -427,7 +419,7 @@ paths:
                 type: string
                 description: "A message indicating the status of the request"
  
-  /potsts/{id}:
+  /posts/{id}:
     delete:
       tags:
         - Posts
@@ -554,8 +546,6 @@ paths:
       summary: Like a post
       tags:
         - Posts
-      security:
-        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -563,19 +553,6 @@ paths:
           description: ID of the post to like
           schema:
             type: integer
-      requestBody:
-        required: true
-        description: User ID to like the post
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userId:
-                  type: integer
-                  description: ID of the user who is liking the post
-              example:
-                userId: 123
       responses:
         '200':
           description: Post liked by user
@@ -598,16 +575,7 @@ paths:
           description: ID of the post to unlike
           schema:
             type: integer
-        - in: body
-          name: body
-          required: true
-          description: Request body containing user ID
-          schema:
-            type: object
-            properties:
-              userId:
-                type: integer
-                description: ID of the user who is unliking the post
+
       responses:
         200:
           description: Post unliked successfully
@@ -650,19 +618,18 @@ paths:
           description: ID of the post to add comment to
           schema:
             type: integer
-        - in: body
-          name: Comment
-          required: true
-          description: Content and user ID of the comment to be added
-          schema:
-            type: object
-            properties:
-              content:
-                type: string
-                description: The content of the comment
-              userId:
-                type: integer
-                description: The ID of the user who made the comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+
       responses:
         '200':
           description: Comment added successfully

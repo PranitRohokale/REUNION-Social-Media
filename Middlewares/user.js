@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken")
+
 exports.isLoggedIn = (req, res, next) => {
     // console.log(req.cookies);
     const token =

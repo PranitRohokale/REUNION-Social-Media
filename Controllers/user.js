@@ -1,4 +1,5 @@
 const User = require("../Model/user")
+const Follow = require("../Model/follow")
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
 
@@ -121,7 +122,7 @@ exports.getUserInfo = async (req, res) => {
         return res.status(200).json({
             status: true,
             data: {
-                ...isUserExists,
+                ...isUserExists?.dataValues,
                 password: undefined
             }
         })
@@ -144,7 +145,7 @@ exports.followUser = async (req, res) => {
 
         // Get the ID of the user to follow
         const userId = req.params.id;
-
+        // console.log(userId);
         // Check if the user to follow exists
         const userToFollow = await User.findByPk(userId);
         if (!userToFollow) {
@@ -153,17 +154,27 @@ exports.followUser = async (req, res) => {
 
         // Check if the authenticated user is already following the user
         const existingFollow = await Follow.findOne({
-            where: { followerId: authUserId, followingId: userId },
+            where: { follower_id: authUserId, following_id: userId },
         });
         if (existingFollow) {
             return res.status(400).json({ error: 'User is already being followed' });
         }
+        
+
 
         // Create a new follow relationship
         const newFollow = await Follow.create({
-            followerId: authUserId,
-            followingId: userId,
+            follower_id: authUserId,
+            following_id: userId,
         });
+
+        await userToFollow.increment('followerCount')
+
+        const currentUser = await User.findByPk(userId);
+        await currentUser.increment('followingCount');
+
+        await currentUser.save()
+        await userToFollow.save()
 
         // Return the ID of the new follow relationship
         return res.status(201).json({ followId: newFollow.id });
@@ -190,7 +201,7 @@ exports.unfollowUser = async (req, res) => {
 
         // Check if the authenticated user is already following the user
         const existingFollow = await Follow.findOne({
-            where: { followerId: authUserId, followingId: userId },
+            where: { follower_id: authUserId, following_id: userId },
         });
         if (!existingFollow) {
             return res.status(400).json({ error: 'User is not being followed' });
@@ -198,7 +209,13 @@ exports.unfollowUser = async (req, res) => {
 
         // Delete the follow relationship
         await existingFollow.destroy();
+        await userToUnfollow.decrement('followerCount')
 
+        const currentUser = await User.findByPk(userId);
+        await currentUser.decrement('followingCount');
+
+        await currentUser.save()
+        await userToUnfollow.save()
         // Return success message
         return res.status(200).json({ message: 'User unfollowed successfully' });
     } catch (error) {
